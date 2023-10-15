@@ -1,0 +1,15 @@
+---
+title: "SOCI 280 101 2023W1: Dear (My) Data"
+output: pdf_document
+author: Jonas Stettner
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Throughout the "Dear (My) Data" assignment, I monitored my emoji usage on WhatsApp over the span of one week. I generated both physical and digital representations of this data. On the following pages, I will reflect on my experiences during this process, providing insights into the reasoning behind the visual choices I made for these representations. I will begin by discussing the selection of the data source and the methods I employed for data collection. Subsequently, I will delve into the choices I made concerning the visualizations and the techniques I used to create them. Finally, I will provide a general reflection on the outcomes and insights gained from this assignment.
+
+## Choice of Data Source
+
