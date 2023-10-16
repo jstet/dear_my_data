@@ -9,3 +9,5 @@ For details, read the Write-Up.
 - `data` contains a libre office spreadsheet that I used to manually enter data and a csv derived from that
 - `images` contains images used in the report including an image of the physical and digial visualization required for this assignment
 - `report` contains an R-Markdown script that can be knitted to produce the Write-Up required for this assignment
+
+
