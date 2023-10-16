@@ -12,6 +12,8 @@ library(ggplot2)
 library(lubridate)
 library(emo)
 library(ggrepel)
+library(ggtext)
+library(knitr)
 data <- read_csv("data/data.csv")
 ```
 
@@ -23,12 +25,20 @@ The task was to collect data on some aspect of our lives that upon analysis coul
 
 Despite these limitations, I decided to use WhatsApp data. In my opinion, this is the most revealing and potentially most insightful data I could collect out of the options I mentioned beforehand. While a location history is also very personal and uncovers much of a persons life, sometimes the context of a location is not clear and, in terms of generating insights, I already know that there is a pattern to my movements. WhatsApp data is even more personal. This platform has witnessed intimate conversations and interactions. I have had disagreements, offered condolences, organized social gatherings, confided in others about challenges in my life, and expressed affection for those close to me. The fact that all of this is potentially accessible to a company is worth exploring and reflecting on. 
 
-One limitation of this data source is that it is unstructured text data. While chats can indeed contain sensible information, information can only be extracted from raw text by humans that would have to read the chats one at a time. To generate spreadheet like data, texts need to be processed with predetermined goals. For this assignment, I wanted to find out if WhatsApp data could reveal something about my emotional state throughout the week. Emotional state in text messages is often intentionally revealed by using (or not using) emojis, so simply counted what emojis I used for a week. To do this, I systematically went through all my chats, starting from the first message on Monday, and recorded this data in a spreadsheet. Each day had its own row, and each emoji was represented as a column. Since emojis have various visual representations, I used standardized Unicode representations as column titles for consistency.
+One limitation of this data source is that it is unstructured text data. While chats can indeed contain sensible information, information can only be extracted from raw text by humans that would have to read the chats one at a time. To generate spreadheet like data, texts need to be processed with predetermined goals. For this assignment, I wanted to find out if WhatsApp data could reveal something about my emotional state throughout the week. Emotional state in text messages is often intentionally revealed by using (or not using) emojis, so simply counted what emojis I used for a week. To do this, I systematically went through all my chats, starting from the first message on Monday, and recorded this data in a spreadsheet. Each day had its own row, and each emoji was represented as a column. Since emojis have various visual representations, I used standardized Unicode representations as column titles for consistency. The final dataset is display in *Fig. 1* below.
+
+```{r echo=FALSE}
+kable(data, format = "markdown", digits = 2)
+```
+<p style="font-size:12px">*Fig. 1: WhatsApp Emoji Counts Dataset*</p>
 
 While there are more sophisticated tools available for detecting emotions in text, I decided not to use them for several reasons. Firstly, such methods appeared to be beyond the scope of this assignment. Secondly, given the personal nature of this data, it felt inappropriate to analyse it by utilizing automated algorithms. Some messages in these chats hold emotional significance for me and some I even avoid revisiting to prevent reliving the emotional states of their context. The thought of storing them in a folder for anonymous programs to process into numerical representations of reduced meaning felt uncomfortable. Additionally, the fact that the raw data includes messages from other people, even though my analysis would have focused only on messages I wrote, it seemed both unfair and unsafe to process this data without their explicit permission.
 
 ## Digital Visualization
 
+The recommended tool for this assignment was Datawrapper, but I made the choice to use ggplot instead. My reason for this decision was the desire to include the actual emojis in my plots and create an overlap between a line plot and a scatter plot. Achieving this level of customization didn't seem feasible with Datawrapper. ggplot, being an R package, offers the flexibility to create highly customized visualizations by leveraging the grammar of graphics.
+
+The motivation behind overlapping a line plot and a scatter plot was rooted in the data itself. Except for the smile emoji (U+1F642), all other emojis were used only once per day. This resulted in a kind of binary pattern that a standard line plot couldn't effectively convey. I did consider using a cross table, but I wanted a unified visualization that could accommodate all emojis. To create this visualization, I had to reconfigure the columns containing all emojis, excluding the smile emoji, so that there was a column for emoji type and its corresponding count per day. The initial attempt at this visualization is depicted in Fig. 2.
 
 ```{r include=FALSE}
 # simple data processing
@@ -38,14 +48,17 @@ emojis <- data %>%
 
 ## transpose part of dataset so that scatterplot is possible
 emojis_transposed <- emojis %>% 
-  select(-2) %>%
   pivot_longer(!Date, names_to = "emoji", values_to = "count")
 
 ## transform unicode notation so that eomjis are displayed 
 emojis_transposed <- emojis_transposed %>%
   mutate(converted_emoji = sapply(emoji, function(cp) intToUtf8(as.integer(sub("U\\+", "0x", cp)))))
+
+emojis_transposed_filt <- emojis_transposed %>%
+  filter(emoji != "U+1F642")
 ```
-```{r echo=FALSE}
+
+```{r echo=FALSE, fig.fullwidth=TRUE}
 emojis %>%
   # Add a new column called label
   mutate(label = if_else(Date == max(Date), as.character(emo::ji("blush")), NA_character_)) %>%
@@ -57,25 +70,85 @@ emojis %>%
   geom_line(aes(x = Date, y = `U+1F642`, group = 1), na.rm = TRUE) +
   
   # Set the title and axis labels
-  labs(title = "Emoji Counts", x = "Date", y = "Count") +
+  labs(x = "Day", y = "Count") +
   
   # Customize the y-axis
   scale_y_continuous(breaks = seq(1, 5), limits = c(0, 4.5)) +
   
   # Add text labels to the plot
-  geom_text_repel(aes(x = Date, y = `U+1F642`, label = label), nudge_x = 1, na.rm = TRUE, size = 8) +
+  geom_text_repel(aes(x = Date, y = `U+1F642`, label = label), nudge_x = 0.2, nudge_y = 0.1, na.rm = TRUE, size = 5.5, segment.color = "transparent") +
   
   # Add points to the plot
-  geom_point(data = emojis_transposed, aes(x = Date, y = count), na.rm = TRUE) +
+  geom_point(data = emojis_transposed_filt, aes(x = Date, y = count), na.rm = TRUE) +
   
   # Add text labels to the plot
-  geom_text_repel(data = emojis_transposed, aes(x = Date, y = count, label = converted_emoji), segment.color = "transparent", na.rm = TRUE, size = 5.5) +
+  geom_text_repel(data = emojis_transposed_filt, aes(x = Date, y = count, label = converted_emoji), segment.color = "transparent", na.rm = TRUE, size = 5.5) +
   
   # Customize the plot appearance
   theme(
     plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"), 
-    plot.title = element_text(size = 18), 
-    axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 10, b = 0, l = 0)), 
-    axis.title.x = element_text(size = 14, margin = margin(t = 10, r = 0, b = 0, l = 0))
-  )
+    plot.title = ggtext::element_markdown(), 
+    axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 10, b = 0, l = 0)), 
+    axis.title.x = element_text(size = 12, margin = margin(t = 10, r = 0, b = 0, l = 0))
+  ) +
+  
+  # Display weekdays on the x-axis
+  scale_x_date(date_breaks = "1 day", date_labels = "%a")
 ```
+<br>
+<p style="font-size:12 px">*Fig. 2: WhatsApp Emoji Counts*</p>
+
+The initial visualization had its limitations, primarily shedding light on the increase in my usage of the smile emoji throughout the week. Given the diverse and sporadic use of other emojis, it proved challenging to draw meaningful insights from it. This prompted the need for a classification approach. I decided to categorize the emojis I used into "positive" and "negative" categories, attributing emojis like the smile emoji to the "positive" category and others like the crying emoji to the "negative" category. Additionally, I calculated the relative usage of emojis. This involved dividing the number of emojis in each category by the total number of emojis used. This normalization process helped prevent bias that might arise from a general increase in emoji usage. The outcome of this analysis is illustrated in *Fig. 3*.
+
+```{r include=FALSE}
+# manually assigning the emojis to classes 
+emojis_class = emojis_transposed %>% 
+  mutate(class = case_when(
+    emoji == "U+1F642" ~ "positive",
+    emoji == "U+1F972" ~ "negative",
+    emoji == "U+1F9A9" ~ "positive",
+    emoji == "U+1F44D" ~ "positive",
+    emoji == "U+1F603" ~ "positive",
+    emoji == "U+2764" ~ "positive",
+    emoji == "U+1F605" ~ "negative",
+    emoji == "U+1FA87" ~ "positive",
+    emoji == "U+1FAF6" ~ "positive",
+    emoji == "U+1F62D" ~ "negative"
+  )) 
+
+
+emojis_class <- emojis_class %>%
+  mutate(count = replace_na(count, 0))
+
+# grouping by day and counting occurance of classes
+emojis_class_count <- emojis_class %>%
+  group_by(Date, class) %>%
+  summarize(sum_count = sum(count))
+```
+
+```{r echo=FALSE, fig.fullwidth=TRUE}
+
+emojis_class_count %>%
+  ggplot() +
+  geom_line(aes(x = Date, y = sum_count, color = class, group = class), na.rm = TRUE) +
+  labs(x = "Day", y = "Count") +
+  scale_y_continuous(breaks = seq(1, 5), limits = c(0, 5)) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"),
+    plot.title = element_markdown(),
+    axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 10, b = 0, l = 0)),
+    axis.title.x = element_text(size = 12, margin = margin(t = 10, r = 0, b = 0, l = 0))
+  ) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%a")
+```
+<br>
+<p style="font-size:12 px">*Fig. 3: WhatsApp Emoji Class Count*</p>
+
+Given the relatively low number of emojis I used throughout the week, the potential for extracting insights may be limited. Despite that, if we assume that the classification into positive and negative emojis is valid, it appears that I tend to use more positive emojis than negative ones, and there's also a noticeable increase in the usage of positive emojis as the week progresses. If we assume that emoji usage reflects one's emotional state, it would imply that I should have felt better towards the end of the week. However, as I will reflect upon later, the reality was quite the opposite.
+
+## Physical Visualization
+
+## 
+
+ 
+
