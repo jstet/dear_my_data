@@ -98,7 +98,7 @@ emojis %>%
 <br>
 <p style="font-size:12 px">*Fig. 2: WhatsApp Emoji Counts*</p>
 
-The initial visualization had its limitations, primarily shedding light on the increase in my usage of the smile emoji throughout the week. Given the diverse and sporadic use of other emojis, it proved challenging to draw meaningful insights from it. This prompted the need for a classification approach. I decided to categorize the emojis I used into "positive" and "negative" categories, attributing emojis like the smile emoji to the "positive" category and others like the crying emoji to the "negative" category. Additionally, I calculated the relative usage of emojis. This involved dividing the number of emojis in each category by the total number of emojis used. This normalization process helped prevent bias that might arise from a general increase in emoji usage. The outcome of this analysis is illustrated in *Fig. 3*.
+The initial visualization had its limitations, primarily shedding light on the increase in my usage of the smile emoji throughout the week. Given the diverse and sporadic use of other emojis, it proved challenging to draw meaningful insights from it. This prompted the need for a classification approach. I decided to categorize the emojis I used into "positive" and "negative" categories, attributing emojis like the smile emoji to the "positive" category and others like the crying emoji to the "negative" category. Additionally, I calculated the relative usage of emojis. This involved dividing the number of emojis in each category by the total number of emojis used. This normalization process helped prevent bias that might arise from a general fluctuation in emoji usage. The outcome of this analysis is illustrated in *Fig. 3*.
 
 ```{r include=FALSE}
 # manually assigning the emojis to classes 
@@ -148,7 +148,15 @@ Given the relatively low number of emojis I used throughout the week, the potent
 
 ## Physical Visualization
 
-## 
+In my pursuit of creating a physical visualization, I aimed to move beyond simply draeing a plot that I could also have created digitally. Also, I wanted take advantage of the nature of emojis, which are expressive symbols themselves. My primary objective was to gain insights into my emotional state, and to achieve this, I thoguht about how people typically convey their emotions in a physical, non-digital manner. The concept that emerged was akin to writing a diary entry but instead of using text, I would create a visual representation by drawing all the emojis I had used on that particular day. I envisioned this as resembling a stacked bar chart, with the emojis forming a diary-like text container. The resulting visualization is displayed in *Fig. 4*.
+<br>
+<p style="font-size:12 px">*Fig. 4: WhatsApp Emoji Diary Visualization*</p>
+Unfortunately, due to my limited drawing abilities, the physical visualization didn't turn out as aesthetically pleasing as I had hoped. Drawing some of the more intricate emojis proved challenging given my skill level. However, in my view, the insights that can be derived from this visualization are similar to the ones from the initial digital attempt (Fig. 2). For the physical visualization, the fact that I didn't use a large number of emojis worked to my advantage, making the task more manageable and the visualization less cluttered. 
+
+
+## Discussion
+
+
 
  
 
