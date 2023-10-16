@@ -2,7 +2,7 @@
 
 This repository contains the code I wrote for the first assignment, Dear (My) Data, of the SOCI 280 101 Data and Society course at UBC.
 
-For details, read the Write-Up.
+For details, read the Write-Up. It is hosted with GitHub pages: 
 
 ## Project Structure
 
